@@ -33,3 +33,18 @@ flutter run
 ## Ekran Görüntüleri
 
 Uygulamaya ait ekran görüntüleri aşağıda yer almaktadır.
+
+### Ana Sayfa
+![Ana Sayfa](home.jfif)
+
+### Ürün Detayı
+![Ürün Detayı](detail.jfif)
+
+### Sepet Boş
+![Sepet Boş](cart_empty.jfif)
+
+### Sepet Dolu
+![Sepet Dolu](cart_full.jfif)
+
+### Sipariş Ekranı
+![Sipariş Ekranı](cart_full3.jfif)
