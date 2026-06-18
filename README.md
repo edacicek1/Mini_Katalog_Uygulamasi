@@ -1,17 +1,35 @@
-# mini_katalog_uygulamasi
+# Mini Katalog Uygulaması
 
-A new Flutter project.
+Flutter ile geliştirilmiş kozmetik katalog uygulaması.
 
-## Getting Started
+## Proje Açıklaması
+Bu uygulama, kozmetik ürünlerini listeleyen ve ürün detaylarını gösteren basit bir mobil katalog uygulamasıdır.
 
-This project is a starting point for a Flutter application.
+## Kullanılan Flutter Sürümü
+Flutter 3.44.2
 
-A few resources to get you started if this is your first Flutter project:
+## Çalıştırma Adımları
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+1. Projeyi klonlayın:
+```bash
+git clone REPOSITORY_URL
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+2. Proje klasörüne girin:
+```bash
+cd mini_katalog_uygulamasi
+```
+
+3. Gerekli paketleri yükleyin:
+```bash
+flutter pub get
+```
+
+4. Uygulamayı çalıştırın:
+```bash
+flutter run
+```
+
+## Ekran Görüntüleri
+
+Uygulamaya ait ekran görüntüleri aşağıda yer almaktadır.
