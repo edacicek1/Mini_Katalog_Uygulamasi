@@ -33,58 +33,72 @@ class Product {
     required this.imageUrl,
     required this.rating,
   });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      name: json['name'],
+      subtitle: json['subtitle'],
+      description: json['description'],
+      price: json['price'],
+      imageUrl: json['imageUrl'],
+      rating: (json['rating'] as num).toDouble(),
+    );
+  }
 }
 
-final List<Product> products = [
-  Product(
-    name: 'Mat Ruj',
-    subtitle: 'Uzun süre kalıcı',
-    price: '₺349',
-    rating: 4.8,
-    imageUrl: 'assets/images/ruj.webp',
-    description: 'Mat bitişli, günlük kullanıma uygun ve yumuşak dokulu ruj.',
-  ),
-  Product(
-    name: 'Fondöten',
-    subtitle: 'Doğal kapatıcılık',
-    price: '₺599',
-    rating: 4.7,
-    imageUrl: 'assets/images/fondoten.jfif',
-    description: 'Cilt tonunu eşitleyen, hafif yapılı ve doğal görünümlü fondöten.',
-  ),
-  Product(
-    name: 'Maskara',
-    subtitle: 'Hacimli kirpikler',
-    price: '₺279',
-    rating: 4.6,
-    imageUrl: 'assets/images/maskara.jfif',
-    description: 'Kirpikleri belirginleştiren, hacim veren siyah maskara.',
-  ),
-  Product(
-    name: 'Parfüm',
-    subtitle: 'Çiçeksi koku',
-    price: '₺1499',
-    rating: 4.9,
-    imageUrl: 'assets/images/parfum.jfif',
-    description: 'Zarif ve çiçeksi notalara sahip, gün boyu kalıcı parfüm.',
-  ),
-  Product(
-    name: 'Allık',
-    subtitle: 'Canlı görünüm',
-    price: '₺399',
-    rating: 4.5,
-    imageUrl: 'assets/images/allik.jfif',
-    description: 'Yanaklara doğal ve canlı renk veren pudra allık.',
-  ),
-  Product(
-    name: 'Nemlendirici',
-    subtitle: 'Cilt bakımı',
-    price: '₺549',
-    rating: 4.7,
-    imageUrl: 'assets/images/nemlendirici.jfif',
-    description: 'Cildi nemlendiren, hafif yapılı günlük bakım kremi.',
-  ),
+final List<Map<String, dynamic>> productJsonData = [
+  {
+    'name': 'Mat Ruj',
+    'subtitle': 'Uzun süre kalıcı',
+    'price': '₺349',
+    'rating': 4.8,
+    'imageUrl': 'assets/images/ruj.webp',
+    'description': 'Mat bitişli, günlük kullanıma uygun ve yumuşak dokulu ruj.',
+  },
+  {
+    'name': 'Fondöten',
+    'subtitle': 'Doğal kapatıcılık',
+    'price': '₺599',
+    'rating': 4.7,
+    'imageUrl': 'assets/images/fondoten.jfif',
+    'description': 'Cilt tonunu eşitleyen, hafif yapılı ve doğal görünümlü fondöten.',
+  },
+  {
+    'name': 'Maskara',
+    'subtitle': 'Hacimli kirpikler',
+    'price': '₺279',
+    'rating': 4.6,
+    'imageUrl': 'assets/images/maskara.jfif',
+    'description': 'Kirpikleri belirginleştiren, hacim veren siyah maskara.',
+  },
+  {
+    'name': 'Parfüm',
+    'subtitle': 'Çiçeksi koku',
+    'price': '₺1499',
+    'rating': 4.9,
+    'imageUrl': 'assets/images/parfum.jfif',
+    'description': 'Zarif ve çiçeksi notalara sahip, gün boyu kalıcı parfüm.',
+  },
+  {
+    'name': 'Allık',
+    'subtitle': 'Canlı görünüm',
+    'price': '₺399',
+    'rating': 4.5,
+    'imageUrl': 'assets/images/allik.jfif',
+    'description': 'Yanaklara doğal ve canlı renk veren pudra allık.',
+  },
+  {
+    'name': 'Nemlendirici',
+    'subtitle': 'Cilt bakımı',
+    'price': '₺549',
+    'rating': 4.7,
+    'imageUrl': 'assets/images/nemlendirici.jfif',
+    'description': 'Cildi nemlendiren, hafif yapılı günlük bakım kremi.',
+  },
 ];
+
+final List<Product> products =
+productJsonData.map((json) => Product.fromJson(json)).toList();
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -95,15 +109,36 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final List<Product> cart = [];
+  List<Product> displayedProducts = List.from(products);
+
+  void filterProducts(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        displayedProducts = List.from(products);
+      } else {
+        displayedProducts = products
+            .where((product) =>
+            product.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
 
   void addToCart(Product product) {
     setState(() => cart.add(product));
   }
 
+  void removeFromCart(Product product) {
+    setState(() => cart.remove(product));
+  }
+
   int get totalPrice {
     int total = 0;
     for (var item in cart) {
-      total += int.tryParse(item.price.replaceAll('₺', '').replaceAll('.', '')) ?? 0;
+      total += int.tryParse(
+        item.price.replaceAll('₺', '').replaceAll('.', ''),
+      ) ??
+          0;
     }
     return total;
   }
@@ -129,13 +164,10 @@ class _HomePageState extends State<HomePage> {
                     MaterialPageRoute(
                       builder: (_) => CartPage(
                         cart: cart,
-                        totalPrice: totalPrice,
-                        onRemove: (product) {
-                          setState(() => cart.remove(product));
-                        },
+                        onRemove: removeFromCart,
                       ),
                     ),
-                  );
+                  ).then((_) => setState(() {}));
                 },
               ),
               if (cart.isNotEmpty)
@@ -165,10 +197,11 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(color: Colors.grey),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16),
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: TextField(
-              decoration: InputDecoration(
+              onChanged: filterProducts,
+              decoration: const InputDecoration(
                 hintText: 'Ürün ara',
                 prefixIcon: Icon(Icons.search),
                 filled: true,
@@ -181,17 +214,20 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
+            child: displayedProducts.isEmpty
+                ? const Center(child: Text('Aradığınız ürün bulunamadı.'))
+                : GridView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              itemCount: displayedProducts.length,
+              gridDelegate:
+              const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
                 childAspectRatio: 0.70,
               ),
               itemBuilder: (context, index) {
-                final product = products[index];
+                final product = displayedProducts[index];
 
                 return GestureDetector(
                   onTap: () {
@@ -203,7 +239,7 @@ class _HomePageState extends State<HomePage> {
                           onAdd: () => addToCart(product),
                         ),
                       ),
-                    );
+                    ).then((_) => setState(() {}));
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -211,7 +247,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(22),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.pink.withOpacity(0.12),
+                          color: Colors.pink.withValues(alpha:0.12),
                           blurRadius: 12,
                           offset: const Offset(0, 5),
                         ),
@@ -237,27 +273,43 @@ class _HomePageState extends State<HomePage> {
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
-                                  Text(product.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  Text(product.subtitle,
-                                      style: const TextStyle(
-                                          color: Colors.grey, fontSize: 12)),
+                                  Text(
+                                    product.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    product.subtitle,
+                                    style: const TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 12,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
                                   Row(
                                     children: [
-                                      const Icon(Icons.star,
-                                          color: Colors.amber, size: 15),
-                                      Text(' ${product.rating}',
-                                          style: const TextStyle(fontSize: 12)),
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                        size: 15,
+                                      ),
+                                      Text(
+                                        ' ${product.rating}',
+                                        style:
+                                        const TextStyle(fontSize: 12),
+                                      ),
                                       const Spacer(),
-                                      Text(product.price,
-                                          style: const TextStyle(
-                                            color: Colors.pink,
-                                            fontWeight: FontWeight.bold,
-                                          )),
+                                      Text(
+                                        product.price,
+                                        style: const TextStyle(
+                                          color: Colors.pink,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -271,8 +323,11 @@ class _HomePageState extends State<HomePage> {
                           child: CircleAvatar(
                             radius: 16,
                             backgroundColor: Colors.white,
-                            child: Icon(Icons.favorite_border,
-                                size: 18, color: Colors.pink),
+                            child: Icon(
+                              Icons.favorite_border,
+                              size: 18,
+                              color: Colors.pink,
+                            ),
                           ),
                         ),
                       ],
@@ -292,7 +347,11 @@ class DetailPage extends StatelessWidget {
   final Product product;
   final VoidCallback onAdd;
 
-  const DetailPage({super.key, required this.product, required this.onAdd});
+  const DetailPage({
+    super.key,
+    required this.product,
+    required this.onAdd,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -305,18 +364,28 @@ class DetailPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(product.imageUrl,
-              height: 270, width: double.infinity, fit: BoxFit.cover),
+          Image.asset(
+            product.imageUrl,
+            height: 270,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(product.name,
-                    style: const TextStyle(
-                        fontSize: 28, fontWeight: FontWeight.bold)),
-                Text(product.subtitle,
-                    style: const TextStyle(color: Colors.grey)),
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  product.subtitle,
+                  style: const TextStyle(color: Colors.grey),
+                ),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -325,15 +394,19 @@ class DetailPage extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                Text(product.price,
-                    style: const TextStyle(
-                        fontSize: 22,
-                        color: Colors.pink,
-                        fontWeight: FontWeight.bold)),
+                Text(
+                  product.price,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    color: Colors.pink,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 18),
-                const Text('Açıklama',
-                    style:
-                    TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Açıklama',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
                 Text(product.description),
               ],
@@ -350,7 +423,8 @@ class DetailPage extends StatelessWidget {
                   backgroundColor: Colors.pink,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18)),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                 ),
                 icon: const Icon(Icons.shopping_bag_outlined),
                 label: const Text('Sepete Ekle'),
@@ -370,17 +444,31 @@ class DetailPage extends StatelessWidget {
   }
 }
 
-class CartPage extends StatelessWidget {
+class CartPage extends StatefulWidget {
   final List<Product> cart;
-  final int totalPrice;
   final Function(Product) onRemove;
 
   const CartPage({
     super.key,
     required this.cart,
-    required this.totalPrice,
     required this.onRemove,
   });
+
+  @override
+  State<CartPage> createState() => _CartPageState();
+}
+
+class _CartPageState extends State<CartPage> {
+  int get totalPrice {
+    int total = 0;
+    for (var item in widget.cart) {
+      total += int.tryParse(
+        item.price.replaceAll('₺', '').replaceAll('.', ''),
+      ) ??
+          0;
+    }
+    return total;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -390,13 +478,16 @@ class CartPage extends StatelessWidget {
         title: const Text('Sepetim'),
         backgroundColor: Colors.pink.shade100,
       ),
-      body: cart.isEmpty
+      body: widget.cart.isEmpty
           ? const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.shopping_cart_outlined,
-                size: 75, color: Colors.grey),
+            Icon(
+              Icons.shopping_cart_outlined,
+              size: 75,
+              color: Colors.grey,
+            ),
             SizedBox(height: 12),
             Text('Sepetin boş'),
           ],
@@ -407,26 +498,32 @@ class CartPage extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(12),
-              itemCount: cart.length,
+              itemCount: widget.cart.length,
               itemBuilder: (context, index) {
-                final product = cart[index];
+                final product = widget.cart[index];
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.asset(product.imageUrl,
-                          width: 55, height: 55, fit: BoxFit.cover),
+                      child: Image.asset(
+                        product.imageUrl,
+                        width: 55,
+                        height: 55,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                     title: Text(product.name),
                     subtitle: Text(product.price),
                     trailing: IconButton(
-                      icon: const Icon(Icons.remove_circle_outline,
-                          color: Colors.pink),
+                      icon: const Icon(
+                        Icons.remove_circle_outline,
+                        color: Colors.pink,
+                      ),
                       onPressed: () {
-                        onRemove(product);
-                        Navigator.pop(context);
+                        widget.onRemove(product);
+                        setState(() {});
                       },
                     ),
                   ),
@@ -438,22 +535,30 @@ class CartPage extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius:
-              BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
             ),
             child: Column(
               children: [
                 Row(
                   children: [
-                    const Text('Toplam Tutar',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Toplam Tutar',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const Spacer(),
-                    Text('₺$totalPrice',
-                        style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.pink,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      '₺$totalPrice',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.pink,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -465,7 +570,8 @@ class CartPage extends StatelessWidget {
                       backgroundColor: Colors.pink,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18)),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
                     ),
                     onPressed: () {},
                     child: const Text('Siparişi Tamamla'),
