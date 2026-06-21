@@ -235,9 +235,9 @@ class _HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => DetailPage(
-                          product: product,
                           onAdd: () => addToCart(product),
                         ),
+                        settings: RouteSettings(arguments: product),
                       ),
                     ).then((_) => setState(() {}));
                   },
@@ -344,17 +344,20 @@ class _HomePageState extends State<HomePage> {
 }
 
 class DetailPage extends StatelessWidget {
-  final Product product;
   final VoidCallback onAdd;
 
   const DetailPage({
     super.key,
-    required this.product,
     required this.onAdd,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    final product =
+    ModalRoute.of(context)!.settings.arguments as Product;
+
+   
     return Scaffold(
       backgroundColor: const Color(0xfffff7fa),
       appBar: AppBar(
